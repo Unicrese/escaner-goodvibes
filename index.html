@@ -114,37 +114,39 @@ input[type=file] { display: none; }
 </div>
 
 <script>
-var BASE_URL = "https://script.google.com/macros/s/AKfycbyaxNAZHhBcUB3IX1-iDES8Q5gKZuG2Vifda_RMwbBalsE3PnIg8Y1VqIOzsOI_55cKsA/exec";
+var BASE_URL = "https://script.google.com/macros/s/AKfycbyV27gsKL4mgCcThUHJJjDrEqu530MXeQil49T455EiCjvh-rAUC0xEh-yE7n4pGnRLVg/exec";
 var participantes = {};
 var ingresosPendientes = [];
 var escaner = null;
 var procesando = false;
 
-function fetchAPI(params) {
-  var url = BASE_URL + params;
-  var proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
-  return fetch(proxyUrl)
-    .then(function(r) { return r.json(); })
-    .then(function(r) {
-      if (r.contents) return JSON.parse(r.contents);
-      throw new Error("Sin respuesta");
-    });
-}
-
 function cargarDesdeAPI() {
   var status = document.getElementById("cargar-status");
   status.innerHTML = "<div class='loading'>Conectando con Google Sheets...</div>";
-  fetchAPI("?action=lista")
-    .then(function(data) {
-      if (data.participantes) {
-        procesarDatos(data.participantes);
-      } else {
-        status.innerHTML = "<p class='error-msg'>Error al cargar: " + (data.error || "intenta de nuevo") + "</p>";
-      }
-    })
-    .catch(function(err) {
-      status.innerHTML = "<p class='error-msg'>Error de conexion. Verifica tu internet e intenta de nuevo.</p>";
-    });
+
+  // Usamos un iframe oculto para evitar CORS
+  var script = document.createElement("script");
+  script.src = BASE_URL + "?action=lista&callback=recibirDatos";
+  script.onerror = function() {
+    status.innerHTML = "<p class='error-msg'>Error de conexion. Intenta con el archivo JSON.</p>";
+  };
+  document.head.appendChild(script);
+
+  // Timeout de 15 segundos
+  setTimeout(function() {
+    if (Object.keys(participantes).length === 0) {
+      status.innerHTML = "<p class='error-msg'>Tiempo de espera agotado. Intenta de nuevo o usa el archivo JSON.</p>";
+    }
+  }, 15000);
+}
+
+function recibirDatos(data) {
+  if (data && data.participantes) {
+    procesarDatos(data.participantes);
+  } else {
+    document.getElementById("cargar-status").innerHTML =
+      "<p class='error-msg'>Error al cargar datos. Intenta de nuevo.</p>";
+  }
 }
 
 function cargarJSON(input) {
@@ -169,7 +171,8 @@ function procesarDatos(data) {
   });
   var total = Object.keys(participantes).length;
   if (total === 0) {
-    document.getElementById("cargar-status").innerHTML = "<p class='error-msg'>No se encontraron participantes confirmados.</p>";
+    document.getElementById("cargar-status").innerHTML =
+      "<p class='error-msg'>No se encontraron participantes confirmados.</p>";
     return;
   }
   document.getElementById("badge").textContent = total + " registros";
@@ -265,7 +268,7 @@ function mostrarSync() {
   document.getElementById("screen-sync").className = "screen active";
   var status = document.getElementById("sync-status");
   if (ingresosPendientes.length === 0) {
-    status.innerHTML = "<p style='color:#C9A8F0;font-size:13px;'>No hay ingresos pendientes de sincronizar.</p>";
+    status.innerHTML = "<p style='color:#C9A8F0;font-size:13px;'>No hay ingresos pendientes.</p>";
   } else {
     status.innerHTML = "<p style='color:#F4872A;font-size:13px;font-weight:bold;'>" + ingresosPendientes.length + " ingresos pendientes de enviar a Sheets.</p>";
   }
@@ -282,18 +285,21 @@ function sincronizarIngresos() {
   }
   var status = document.getElementById("sync-status");
   status.innerHTML = "<div class='loading'>Sincronizando " + ingresosPendientes.length + " ingresos...</div>";
-  var promesas = ingresosPendientes.map(function(sid) {
-    return fetchAPI("?action=ingresar&sid=" + encodeURIComponent(sid));
+  var completados = 0;
+  var exitosos = 0;
+  ingresosPendientes.forEach(function(sid) {
+    var script = document.createElement("script");
+    script.src = BASE_URL + "?action=ingresar&sid=" + encodeURIComponent(sid) + "&callback=syncCallback" + sid;
+    window["syncCallback" + sid] = function(data) {
+      completados++;
+      if (data && data.success) exitosos++;
+      if (completados === ingresosPendientes.length) {
+        ingresosPendientes = [];
+        status.innerHTML = "<div class='exito'>" + exitosos + " ingresos sincronizados en Google Sheets.</div>";
+      }
+    };
+    document.head.appendChild(script);
   });
-  Promise.all(promesas)
-    .then(function(resultados) {
-      var exitosos = resultados.filter(function(r) { return r.success; }).length;
-      ingresosPendientes = [];
-      status.innerHTML = "<div class='exito'>" + exitosos + " ingresos sincronizados en Google Sheets.</div>";
-    })
-    .catch(function() {
-      status.innerHTML = "<p class='error-msg'>Error de conexion. Verifica internet e intenta de nuevo.</p>";
-    });
 }
 </script>
 </body>
