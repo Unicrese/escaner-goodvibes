@@ -25,7 +25,6 @@ body { font-family: Arial, sans-serif; background: #1a0a3e; color: #fff; min-hei
 .tipo { font-size: 13px; color: #C9A8F0; margin: 0 0 14px; }
 .estado { font-size: 12px; padding: 5px 12px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
 .estado.confirmado { background: #1B7B6E; color: #fff; }
-.estado.pendiente { background: #856404; color: #fff; }
 .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
 .btn-ingresar { background: linear-gradient(135deg, #E8317A, #F4872A); color: #fff; }
 .btn-nuevo { background: #4A1B8C; color: #fff; }
@@ -116,30 +115,35 @@ input[type=file] { display: none; }
 
 <script>
 var BASE_URL = "https://script.google.com/macros/s/AKfycbyE6PN6wBs1tLUPYwhTP75ZLrftuk-wCrtnrypxKj6717qnh_twoOayPs6KX3UXCvlYuw/exec";
-var PROXY = "https://corsproxy.io/?";
 var participantes = {};
 var ingresosPendientes = [];
 var escaner = null;
 var procesando = false;
 
-function apiUrl(params) {
-  return PROXY + encodeURIComponent(BASE_URL + params);
+function fetchAPI(params) {
+  var url = BASE_URL + params;
+  var proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
+  return fetch(proxyUrl)
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.contents) return JSON.parse(r.contents);
+      throw new Error("Sin respuesta");
+    });
 }
 
 function cargarDesdeAPI() {
   var status = document.getElementById("cargar-status");
   status.innerHTML = "<div class='loading'>Conectando con Google Sheets...</div>";
-  fetch(apiUrl("?action=lista"))
-    .then(function(r) { return r.json(); })
+  fetchAPI("?action=lista")
     .then(function(data) {
       if (data.participantes) {
         procesarDatos(data.participantes);
       } else {
-        status.innerHTML = "<p class='error-msg'>Error al cargar. Verifica tu conexion e intenta de nuevo.</p>";
+        status.innerHTML = "<p class='error-msg'>Error al cargar: " + (data.error || "intenta de nuevo") + "</p>";
       }
     })
     .catch(function(err) {
-      status.innerHTML = "<p class='error-msg'>Sin conexion. Verifica tu internet e intenta de nuevo.</p>";
+      status.innerHTML = "<p class='error-msg'>Error de conexion. Verifica tu internet e intenta de nuevo.</p>";
     });
 }
 
@@ -152,7 +156,7 @@ function cargarJSON(input) {
       var data = JSON.parse(e.target.result);
       procesarDatos(Array.isArray(data) ? data : data.participantes || []);
     } catch(err) {
-      alert("Error al leer el archivo. Asegurate que sea un JSON valido.");
+      alert("Error al leer el archivo.");
     }
   };
   reader.readAsText(file);
@@ -190,7 +194,7 @@ function iniciarEscaner() {
     function(err) {}
   ).catch(function(err) {
     document.getElementById("reader").innerHTML =
-      "<p class='error-msg' style='padding:30px;'>No se pudo acceder a la camara.<br>Da permiso en tu navegador e intenta de nuevo.</p>";
+      "<p class='error-msg' style='padding:30px;'>No se pudo acceder a la camara.<br>Da permiso en tu navegador.</p>";
   });
 }
 
@@ -279,8 +283,7 @@ function sincronizarIngresos() {
   var status = document.getElementById("sync-status");
   status.innerHTML = "<div class='loading'>Sincronizando " + ingresosPendientes.length + " ingresos...</div>";
   var promesas = ingresosPendientes.map(function(sid) {
-    return fetch(apiUrl("?action=ingresar&sid=" + encodeURIComponent(sid)))
-      .then(function(r) { return r.json(); });
+    return fetchAPI("?action=ingresar&sid=" + encodeURIComponent(sid));
   });
   Promise.all(promesas)
     .then(function(resultados) {
