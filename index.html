@@ -2,137 +2,257 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Escaner QR - Good Vibes Reset</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #1a0a3e; color: #fff; min-height: 100vh; }
-.header { background: #4A1B8C; padding: 16px; text-align: center; }
-.header h1 { font-size: 20px; color: #fff; margin: 0; }
-.header p { font-size: 13px; color: #C9A8F0; margin: 4px 0 0; }
-.container { padding: 16px; max-width: 480px; margin: auto; }
-#reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-.card { background: #2a1060; border-radius: 12px; padding: 20px; margin-top: 16px; display: none; }
+.header { background: #4A1B8C; padding: 14px 16px; text-align: center; position: relative; }
+.header h1 { font-size: 18px; color: #fff; }
+.header p { font-size: 12px; color: #C9A8F0; margin-top: 2px; }
+.badge { position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+.badge.online { background: #1B7B6E; color: #fff; }
+.badge.offline { background: #856404; color: #fff; }
+.container { padding: 14px; max-width: 480px; margin: auto; }
+#reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: #000; }
+.card { background: #2a1060; border-radius: 12px; padding: 18px; margin-top: 12px; display: none; }
 .card.visible { display: block; }
 .card.ok { border: 2px solid #1B7B6E; }
 .card.ya { border: 2px solid #F4872A; }
 .card.error { border: 2px solid #E8317A; }
-.nombre { font-size: 22px; font-weight: bold; color: #fff; margin: 0 0 8px; }
-.tipo { font-size: 14px; color: #C9A8F0; margin: 0 0 16px; }
-.estado { font-size: 13px; padding: 6px 12px; border-radius: 20px; display: inline-block; margin-bottom: 16px; }
-.estado.pendiente { background: #856404; color: #fff; }
+.card.warn { border: 2px solid #856404; }
+.nombre { font-size: 20px; font-weight: bold; color: #fff; margin: 0 0 6px; }
+.tipo { font-size: 13px; color: #C9A8F0; margin: 0 0 14px; }
+.estado { font-size: 12px; padding: 5px 12px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
 .estado.confirmado { background: #1B7B6E; color: #fff; }
-.btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.estado.pendiente { background: #856404; color: #fff; }
+.btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
 .btn-ingresar { background: linear-gradient(135deg, #E8317A, #F4872A); color: #fff; }
 .btn-nuevo { background: #4A1B8C; color: #fff; }
-.ya-ingreso { background: #F4872A; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; }
-.exito { background: #1B7B6E; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; }
-.loading { text-align: center; padding: 20px; color: #C9A8F0; }
-.error-msg { color: #E8317A; text-align: center; padding: 10px; }
+.btn-sync { background: #1B7B6E; color: #fff; }
+.btn-cargar { background: #4A1B8C; color: #fff; width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; }
+.ya-ingreso { background: #F4872A; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 14px; }
+.exito { background: #1B7B6E; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 14px; }
+.loading { text-align: center; padding: 20px; color: #C9A8F0; font-size: 14px; }
+.error-msg { color: #E8317A; text-align: center; padding: 10px; font-size: 14px; }
+.panel { background: #2a1060; border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+.panel h3 { font-size: 15px; color: #C9A8F0; margin-bottom: 12px; }
+.stats { display: flex; gap: 10px; margin-bottom: 14px; }
+.stat { flex: 1; background: #1a0a3e; border-radius: 8px; padding: 12px; text-align: center; }
+.stat-num { font-size: 24px; font-weight: bold; color: #fff; }
+.stat-label { font-size: 11px; color: #C9A8F0; margin-top: 2px; }
+.pendientes { background: #856404; }
+.ingresados { background: #1B7B6E; }
+input[type=file] { display: none; }
+.screen { display: none; }
+.screen.active { display: block; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>Good Vibes Reset</h1>
-  <p>Escaner de acceso al evento</p>
+  <p>Control de acceso</p>
+  <span class="badge offline" id="badge">SIN DATOS</span>
 </div>
 
 <div class="container">
-  <div id="reader"></div>
-  <div id="resultado" class="card"></div>
+
+  <!-- PANTALLA 1: Cargar datos -->
+  <div id="screen-cargar" class="screen active">
+    <div class="panel">
+      <h3>Paso 1 — Cargar lista de participantes</h3>
+      <p style="font-size:13px;color:#C9A8F0;margin-bottom:16px;line-height:1.6;">
+        Antes del evento descarga la lista de participantes confirmados desde Google Sheets y cargala aqui. Una vez cargada el escaner funciona sin internet.
+      </p>
+      <button class="btn-cargar" onclick="document.getElementById('file-input').click()">
+        Cargar lista (archivo JSON)
+      </button>
+      <input type="file" id="file-input" accept=".json" onchange="cargarJSON(this)">
+      <p style="font-size:12px;color:#856404;margin-top:12px;text-align:center;">
+        O si tienes internet, conectate directamente:
+      </p>
+      <button class="btn-cargar" style="background:#2a1060;border:1px solid #4A1B8C;margin-top:8px;" onclick="cargarDesdeAPI()">
+        Cargar desde Google Sheets
+      </button>
+    </div>
+  </div>
+
+  <!-- PANTALLA 2: Escaner -->
+  <div id="screen-escaner" class="screen">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num" id="total-count">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat pendientes">
+        <div class="stat-num" id="pendiente-count">0</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat ingresados">
+        <div class="stat-num" id="ingresado-count">0</div>
+        <div class="stat-label">Ingresados</div>
+      </div>
+    </div>
+    <div id="reader"></div>
+    <div id="resultado" class="card"></div>
+    <button class="btn btn-sync" style="margin-top:14px;" onclick="mostrarSync()">
+      Sincronizar ingresos a Sheets
+    </button>
+  </div>
+
+  <!-- PANTALLA 3: Sincronizar -->
+  <div id="screen-sync" class="screen">
+    <div class="panel">
+      <h3>Sincronizar ingresos</h3>
+      <p style="font-size:13px;color:#C9A8F0;margin-bottom:16px;line-height:1.6;">
+        Conectate a internet y presiona el boton para enviar todos los ingresos registrados a Google Sheets.
+      </p>
+      <div id="sync-status" style="margin-bottom:14px;"></div>
+      <button class="btn btn-sync" onclick="sincronizarIngresos()">Enviar ingresos a Sheets</button>
+      <button class="btn btn-nuevo" style="margin-top:8px;" onclick="volverEscaner()">Volver al escaner</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
 var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyE6PN6wBs1tLUPYwhTP75ZLrftuk-wCrtnrypxKj6717qnh_twoOayPs6KX3UXCvlYuw/exec";
+var participantes = {};
+var ingresosPendientes = [];
 var escaner = null;
 var procesando = false;
+
+// ================================================
+// CARGAR DATOS
+// ================================================
+function cargarJSON(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      procesarDatos(data);
+    } catch(err) {
+      alert("Error al leer el archivo. Asegurate que sea un JSON valido.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function cargarDesdeAPI() {
+  var btn = event.target;
+  btn.textContent = "Cargando...";
+  btn.disabled = true;
+  fetch(APPS_SCRIPT_URL + "?action=lista")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.participantes) {
+        procesarDatos(data.participantes);
+      } else {
+        alert("Error al cargar. Verifica tu conexion.");
+        btn.textContent = "Cargar desde Google Sheets";
+        btn.disabled = false;
+      }
+    })
+    .catch(function() {
+      alert("Sin conexion a internet.");
+      btn.textContent = "Cargar desde Google Sheets";
+      btn.disabled = false;
+    });
+}
+
+function procesarDatos(data) {
+  participantes = {};
+  if (Array.isArray(data)) {
+    data.forEach(function(p) {
+      if (p.sid) participantes[String(p.sid)] = p;
+    });
+  } else {
+    participantes = data;
+  }
+  var total = Object.keys(participantes).length;
+  if (total === 0) {
+    alert("No se encontraron participantes en el archivo.");
+    return;
+  }
+  document.getElementById("badge").textContent = total + " registros";
+  document.getElementById("badge").className = "badge online";
+  actualizarStats();
+  mostrarEscaner();
+}
+
+// ================================================
+// ESCANER
+// ================================================
+function mostrarEscaner() {
+  document.getElementById("screen-cargar").className = "screen";
+  document.getElementById("screen-escaner").className = "screen active";
+  document.getElementById("screen-sync").className = "screen";
+  if (!escaner) {
+    setTimeout(iniciarEscaner, 300);
+  }
+}
 
 function iniciarEscaner() {
   escaner = new Html5Qrcode("reader");
   escaner.start(
     { facingMode: "environment" },
-    { fps: 10, qrbox: { width: 250, height: 250 } },
+    { fps: 15, qrbox: { width: 260, height: 260 } },
     onScanExito,
     function(err) {}
   ).catch(function(err) {
     document.getElementById("reader").innerHTML =
-      "<p class='error-msg'>No se pudo acceder a la camara.<br>Asegurate de dar permiso en tu navegador.</p>";
+      "<p class='error-msg' style='padding:30px;'>No se pudo acceder a la camara.<br>Da permiso en tu navegador.</p>";
   });
 }
 
 function onScanExito(sid) {
   if (procesando) return;
   procesando = true;
-  escaner.pause();
-  mostrarCargando("Buscando participante...");
-  fetch(APPS_SCRIPT_URL + "?action=buscar&sid=" + encodeURIComponent(sid))
-    .then(function(r) { return r.json(); })
-    .then(function(data) { mostrarResultado(data); })
-    .catch(function(err) { mostrarError("Error de conexion. Verifica tu internet."); });
+  if (escaner) escaner.pause();
+  buscarLocal(sid.trim());
 }
 
-function mostrarCargando(msg) {
+function buscarLocal(sid) {
+  var p = participantes[sid];
   var el = document.getElementById("resultado");
-  el.className = "card visible";
-  el.innerHTML = "<div class='loading'>" + msg + "</div>";
-}
-
-function mostrarResultado(data) {
-  var el = document.getElementById("resultado");
-  if (!data.encontrado) {
+  if (!p) {
     el.className = "card visible error";
     el.innerHTML =
       "<p class='nombre'>QR no valido</p>" +
-      "<p class='tipo'>Este codigo no corresponde a ningun registro.</p>" +
+      "<p class='tipo'>Este codigo no corresponde a ningun registro confirmado.</p>" +
       "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Escanear otro</button>";
     return;
   }
-  var yaIngreso = data.ingreso === "Si";
-  var estadoClass = data.estado === "Confirmado" ? "confirmado" : "pendiente";
-  var html = "<p class='nombre'>" + data.nombre + "</p>";
-  html += "<p class='tipo'>" + data.tipo + "</p>";
-  html += "<span class='estado " + estadoClass + "'>" + data.estado + "</span>";
+  var yaIngreso = p.ingreso === "Si";
+  var html = "<p class='nombre'>" + p.nombre + "</p>";
+  html += "<p class='tipo'>" + p.tipo + "</p>";
+  html += "<span class='estado confirmado'>Confirmado</span>";
   if (yaIngreso) {
     el.className = "card visible ya";
     html += "<div class='ya-ingreso'>Ya registro ingreso anteriormente</div>";
     html += "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Escanear otro</button>";
   } else {
     el.className = "card visible ok";
-    html += "<button class='btn btn-ingresar' onclick='confirmarIngreso(\"" + data.sid + "\")'>Confirmar Ingreso</button>";
+    html += "<button class='btn btn-ingresar' onclick='confirmarIngreso(\"" + sid + "\")'>Confirmar Ingreso</button>";
     html += "<button class='btn btn-nuevo' style='margin-top:8px' onclick='nuevoEscan()'>Cancelar</button>";
   }
   el.innerHTML = html;
 }
 
 function confirmarIngreso(sid) {
-  mostrarCargando("Registrando ingreso...");
-  fetch(APPS_SCRIPT_URL + "?action=ingresar&sid=" + encodeURIComponent(sid))
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var el = document.getElementById("resultado");
-      if (data.success) {
-        el.className = "card visible ok";
-        el.innerHTML =
-          "<div class='exito'>Ingreso registrado exitosamente</div>" +
-          "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Siguiente participante</button>";
-      } else {
-        el.className = "card visible error";
-        el.innerHTML =
-          "<p class='error-msg'>Error al registrar. Intenta de nuevo.</p>" +
-          "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Reintentar</button>";
-      }
-    })
-    .catch(function() { mostrarError("Error de conexion."); });
-}
-
-function mostrarError(msg) {
+  participantes[sid].ingreso = "Si";
+  ingresosPendientes.push(sid);
+  actualizarStats();
   var el = document.getElementById("resultado");
-  el.className = "card visible error";
+  el.className = "card visible ok";
   el.innerHTML =
-    "<p class='error-msg'>" + msg + "</p>" +
-    "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Reintentar</button>";
+    "<div class='exito'>Ingreso registrado</div>" +
+    "<p class='tipo' style='text-align:center;margin-bottom:14px;'>Pendiente de sincronizar: " + ingresosPendientes.length + "</p>" +
+    "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Siguiente participante</button>";
 }
 
 function nuevoEscan() {
@@ -140,10 +260,57 @@ function nuevoEscan() {
   var el = document.getElementById("resultado");
   el.className = "card";
   el.innerHTML = "";
-  escaner.resume();
+  if (escaner) escaner.resume();
 }
 
-window.onload = iniciarEscaner;
+function actualizarStats() {
+  var total = Object.keys(participantes).length;
+  var ingresados = Object.values(participantes).filter(function(p) { return p.ingreso === "Si"; }).length;
+  document.getElementById("total-count").textContent = total;
+  document.getElementById("ingresado-count").textContent = ingresados;
+  document.getElementById("pendiente-count").textContent = total - ingresados;
+}
+
+// ================================================
+// SINCRONIZAR
+// ================================================
+function mostrarSync() {
+  document.getElementById("screen-escaner").className = "screen";
+  document.getElementById("screen-sync").className = "screen active";
+  var status = document.getElementById("sync-status");
+  if (ingresosPendientes.length === 0) {
+    status.innerHTML = "<p style='color:#C9A8F0;font-size:13px;'>No hay ingresos pendientes de sincronizar.</p>";
+  } else {
+    status.innerHTML = "<p style='color:#F4872A;font-size:13px;font-weight:bold;'>" + ingresosPendientes.length + " ingresos pendientes de enviar a Sheets.</p>";
+  }
+}
+
+function volverEscaner() {
+  mostrarEscaner();
+}
+
+function sincronizarIngresos() {
+  if (ingresosPendientes.length === 0) {
+    alert("No hay ingresos pendientes.");
+    return;
+  }
+  var status = document.getElementById("sync-status");
+  status.innerHTML = "<div class='loading'>Sincronizando " + ingresosPendientes.length + " ingresos...</div>";
+  var promesas = ingresosPendientes.map(function(sid) {
+    return fetch(APPS_SCRIPT_URL + "?action=ingresar&sid=" + encodeURIComponent(sid))
+      .then(function(r) { return r.json(); });
+  });
+  Promise.all(promesas)
+    .then(function(resultados) {
+      var exitosos = resultados.filter(function(r) { return r.success; }).length;
+      ingresosPendientes = [];
+      status.innerHTML =
+        "<div class='exito'>" + exitosos + " ingresos sincronizados exitosamente en Google Sheets.</div>";
+    })
+    .catch(function() {
+      status.innerHTML = "<p class='error-msg'>Error de conexion. Verifica internet e intenta de nuevo.</p>";
+    });
+}
 </script>
 </body>
 </html>
