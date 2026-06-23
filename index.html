@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escaner QR - Good Vibes Reset</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #1a0a3e; color: #fff; min-height: 100vh; }
+.header { background: #4A1B8C; padding: 16px; text-align: center; }
+.header h1 { font-size: 20px; color: #fff; margin: 0; }
+.header p { font-size: 13px; color: #C9A8F0; margin: 4px 0 0; }
+.container { padding: 16px; max-width: 480px; margin: auto; }
+#reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.card { background: #2a1060; border-radius: 12px; padding: 20px; margin-top: 16px; display: none; }
+.card.visible { display: block; }
+.card.ok { border: 2px solid #1B7B6E; }
+.card.ya { border: 2px solid #F4872A; }
+.card.error { border: 2px solid #E8317A; }
+.nombre { font-size: 22px; font-weight: bold; color: #fff; margin: 0 0 8px; }
+.tipo { font-size: 14px; color: #C9A8F0; margin: 0 0 16px; }
+.estado { font-size: 13px; padding: 6px 12px; border-radius: 20px; display: inline-block; margin-bottom: 16px; }
+.estado.pendiente { background: #856404; color: #fff; }
+.estado.confirmado { background: #1B7B6E; color: #fff; }
+.btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.btn-ingresar { background: linear-gradient(135deg, #E8317A, #F4872A); color: #fff; }
+.btn-nuevo { background: #4A1B8C; color: #fff; }
+.ya-ingreso { background: #F4872A; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; }
+.exito { background: #1B7B6E; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 12px; }
+.loading { text-align: center; padding: 20px; color: #C9A8F0; }
+.error-msg { color: #E8317A; text-align: center; padding: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Good Vibes Reset</h1>
+  <p>Escaner de acceso al evento</p>
+</div>
+
+<div class="container">
+  <div id="reader"></div>
+  <div id="resultado" class="card"></div>
+</div>
+
+<script>
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyE6PN6wBs1tLUPYwhTP75ZLrftuk-wCrtnrypxKj6717qnh_twoOayPs6KX3UXCvlYuw/exec";
+var escaner = null;
+var procesando = false;
+
+function iniciarEscaner() {
+  escaner = new Html5Qrcode("reader");
+  escaner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    onScanExito,
+    function(err) {}
+  ).catch(function(err) {
+    document.getElementById("reader").innerHTML =
+      "<p class='error-msg'>No se pudo acceder a la camara.<br>Asegurate de dar permiso en tu navegador.</p>";
+  });
+}
+
+function onScanExito(sid) {
+  if (procesando) return;
+  procesando = true;
+  escaner.pause();
+  mostrarCargando("Buscando participante...");
+  fetch(APPS_SCRIPT_URL + "?action=buscar&sid=" + encodeURIComponent(sid))
+    .then(function(r) { return r.json(); })
+    .then(function(data) { mostrarResultado(data); })
+    .catch(function(err) { mostrarError("Error de conexion. Verifica tu internet."); });
+}
+
+function mostrarCargando(msg) {
+  var el = document.getElementById("resultado");
+  el.className = "card visible";
+  el.innerHTML = "<div class='loading'>" + msg + "</div>";
+}
+
+function mostrarResultado(data) {
+  var el = document.getElementById("resultado");
+  if (!data.encontrado) {
+    el.className = "card visible error";
+    el.innerHTML =
+      "<p class='nombre'>QR no valido</p>" +
+      "<p class='tipo'>Este codigo no corresponde a ningun registro.</p>" +
+      "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Escanear otro</button>";
+    return;
+  }
+  var yaIngreso = data.ingreso === "Si";
+  var estadoClass = data.estado === "Confirmado" ? "confirmado" : "pendiente";
+  var html = "<p class='nombre'>" + data.nombre + "</p>";
+  html += "<p class='tipo'>" + data.tipo + "</p>";
+  html += "<span class='estado " + estadoClass + "'>" + data.estado + "</span>";
+  if (yaIngreso) {
+    el.className = "card visible ya";
+    html += "<div class='ya-ingreso'>Ya registro ingreso anteriormente</div>";
+    html += "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Escanear otro</button>";
+  } else {
+    el.className = "card visible ok";
+    html += "<button class='btn btn-ingresar' onclick='confirmarIngreso(\"" + data.sid + "\")'>Confirmar Ingreso</button>";
+    html += "<button class='btn btn-nuevo' style='margin-top:8px' onclick='nuevoEscan()'>Cancelar</button>";
+  }
+  el.innerHTML = html;
+}
+
+function confirmarIngreso(sid) {
+  mostrarCargando("Registrando ingreso...");
+  fetch(APPS_SCRIPT_URL + "?action=ingresar&sid=" + encodeURIComponent(sid))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById("resultado");
+      if (data.success) {
+        el.className = "card visible ok";
+        el.innerHTML =
+          "<div class='exito'>Ingreso registrado exitosamente</div>" +
+          "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Siguiente participante</button>";
+      } else {
+        el.className = "card visible error";
+        el.innerHTML =
+          "<p class='error-msg'>Error al registrar. Intenta de nuevo.</p>" +
+          "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Reintentar</button>";
+      }
+    })
+    .catch(function() { mostrarError("Error de conexion."); });
+}
+
+function mostrarError(msg) {
+  var el = document.getElementById("resultado");
+  el.className = "card visible error";
+  el.innerHTML =
+    "<p class='error-msg'>" + msg + "</p>" +
+    "<button class='btn btn-nuevo' onclick='nuevoEscan()'>Reintentar</button>";
+}
+
+function nuevoEscan() {
+  procesando = false;
+  var el = document.getElementById("resultado");
+  el.className = "card";
+  el.innerHTML = "";
+  escaner.resume();
+}
+
+window.onload = iniciarEscaner;
+</script>
+</body>
+</html>
