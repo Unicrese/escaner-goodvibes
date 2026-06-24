@@ -12,17 +12,18 @@ body { font-family: Arial, sans-serif; background: #1a0a3e; color: #fff; min-hei
 .header p { font-size: 13px; color: #C9A8F0; margin-top: 4px; }
 .container { padding: 16px; max-width: 560px; margin: auto; }
 .panel { background: #2a1060; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-.panel h3 { font-size: 14px; color: #C9A8F0; margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase; }
+.panel h3 { font-size: 13px; color: #C9A8F0; margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase; }
 .input-group { margin-bottom: 12px; }
 label { font-size: 12px; color: #C9A8F0; display: block; margin-bottom: 6px; }
-input[type=text], input[type=number], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #4A1B8C; background: #1a0a3e; color: #fff; font-size: 14px; }
-input[type=text]::placeholder, input[type=number]::placeholder { color: #555; }
+input[type=text], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #4A1B8C; background: #1a0a3e; color: #fff; font-size: 14px; }
+input[type=text]::placeholder { color: #555; }
 select option { background: #1a0a3e; }
-.filtros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+.filtros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-cargar { background: #4A1B8C; color: #fff; }
-.btn-rifar { background: linear-gradient(135deg, #E8317A, #F4872A); color: #fff; font-size: 20px; padding: 22px; }
+.btn-historial { background: #2a1060; border: 1px solid #4A1B8C; color: #C9A8F0; font-size: 13px; padding: 10px; }
+.btn-rifar { background: linear-gradient(135deg, #E8317A, #F4872A); color: #fff; font-size: 22px; padding: 22px; margin-top: 16px; }
 .btn-correo { background: #1B7B6E; color: #fff; }
 .btn-otro { background: #856404; color: #fff; }
 .btn-nuevo { background: #3a2060; border: 1px solid #4A1B8C; color: #fff; }
@@ -30,53 +31,49 @@ select option { background: #1a0a3e; }
 .stat { flex: 1; background: #1a0a3e; border-radius: 10px; padding: 12px 8px; text-align: center; }
 .stat-num { font-size: 26px; font-weight: bold; }
 .stat-label { font-size: 10px; color: #C9A8F0; margin-top: 2px; }
-.stat-pool { background: #4A1B8C; }
-.stat-rifas { background: #856404; }
-.stat-ganados { background: #1B7B6E; }
-
-/* Ruleta */
+.s-pool { background: #4A1B8C; }
+.s-rifas { background: #856404; }
+.s-conf { background: #1B7B6E; }
 .rolling { display: none; text-align: center; padding: 40px 20px; }
 .rolling.visible { display: block; }
 .rolling-label { font-size: 13px; color: #C9A8F0; margin-bottom: 16px; }
 .rolling-name { font-size: 26px; font-weight: bold; color: #E8317A; min-height: 40px; animation: flicker 0.08s infinite; }
 @keyframes flicker { 0%{opacity:1} 50%{opacity:0.2} 100%{opacity:1} }
-
-/* Ganador */
-.winner-box { display: none; text-align: center; padding: 20px; }
+.winner-box { display: none; text-align: center; padding: 20px 10px; }
 .winner-box.visible { display: block; }
-.confetti { font-size: 50px; margin-bottom: 12px; animation: spin 1s infinite linear; }
-@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.confetti { font-size: 52px; margin-bottom: 12px; animation: pulse 0.8s infinite alternate; }
+@keyframes pulse { from{transform:scale(1)} to{transform:scale(1.15)} }
 .winner-name { font-size: 28px; font-weight: bold; color: #fff; margin-bottom: 6px; line-height: 1.3; }
-.winner-tipo { font-size: 13px; color: #C9A8F0; margin-bottom: 6px; }
-.winner-metodo { font-size: 12px; color: #856404; margin-bottom: 16px; }
-.winner-premio { font-size: 18px; font-weight: bold; color: #F4872A; padding: 10px 20px; background: #1a0a3e; border-radius: 20px; display: inline-block; margin-bottom: 6px; }
-.winner-sponsor { font-size: 12px; color: #C9A8F0; margin-bottom: 20px; }
-
-/* Lista ganadores */
+.winner-sub { font-size: 13px; color: #C9A8F0; margin-bottom: 4px; }
+.winner-premio { font-size: 18px; font-weight: bold; color: #F4872A; padding: 10px 20px; background: #1a0a3e; border-radius: 20px; display: inline-block; margin: 12px 0 4px; }
+.winner-sponsor { font-size: 12px; color: #856404; margin-bottom: 20px; }
+.exito-msg { background: #1B7B6E; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; margin-bottom: 8px; }
+.error-msg { color: #E8317A; font-size: 13px; text-align: center; padding: 8px; }
+.loading { text-align: center; padding: 20px; color: #C9A8F0; font-size: 14px; }
+.pool-info { font-size: 11px; color: #856404; text-align: center; margin-top: 10px; }
 .ganadores-list { list-style: none; }
 .ganadores-list li { padding: 10px 0; border-bottom: 1px solid #3a2060; }
 .ganadores-list li:last-child { border-bottom: none; }
-.g-nombre { font-size: 14px; font-weight: bold; color: #fff; }
-.g-premio { font-size: 12px; color: #F4872A; margin-top: 2px; }
+.g-num { font-size: 11px; color: #C9A8F0; }
+.g-nombre { font-size: 15px; font-weight: bold; color: #fff; margin: 2px 0; }
+.g-premio { font-size: 12px; color: #F4872A; }
 .g-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 4px; }
 .badge-ok { background: #1B7B6E; color: #fff; }
 .badge-pend { background: #856404; color: #fff; }
-
-.loading { text-align: center; padding: 20px; color: #C9A8F0; font-size: 14px; }
-.error-msg { color: #E8317A; font-size: 13px; text-align: center; padding: 8px; }
-.exito-msg { background: #1B7B6E; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; margin-bottom: 8px; }
-.pool-info { font-size: 12px; color: #C9A8F0; text-align: center; margin-top: 8px; }
-
+.divider { height: 1px; background: #3a2060; margin: 14px 0; }
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
+.tab.active { background: #4A1B8C; color: #fff; }
+.tab.inactive { background: #2a1060; color: #C9A8F0; border: 1px solid #4A1B8C; }
 .screen { display: none; }
 .screen.active { display: block; }
-.divider { height: 1px; background: #3a2060; margin: 12px 0; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>🎉 Rifa Good Vibes Reset</h1>
-  <p>Sistema de sorteo para el evento</p>
+  <p>Sistema de sorteo — solo participantes que ingresaron</p>
 </div>
 
 <div class="container">
@@ -90,15 +87,15 @@ select option { background: #1a0a3e; }
         <input type="text" id="sponsor-input" placeholder="Ej: Yoga Studio Panama">
       </div>
       <div class="divider"></div>
-      <h3 style="margin-bottom:14px;">Filtros del pool</h3>
+      <h3 style="margin-bottom:14px;">Filtrar participantes</h3>
       <div class="filtros">
         <div class="input-group">
           <label>Metodo de pago</label>
           <select id="filtro-metodo">
             <option value="">Todos</option>
             <option value="Yappy">Yappy</option>
-            <option value="Tarjeta">Tarjeta Debito/Credito</option>
-            <option value="Transferencia">Transferencia Bancaria</option>
+            <option value="Tarjeta">Tarjeta</option>
+            <option value="Transferencia">Transferencia</option>
           </select>
         </div>
         <div class="input-group">
@@ -114,6 +111,10 @@ select option { background: #1a0a3e; }
         Cargar participantes desde Sheets
       </button>
       <div id="config-status" style="margin-top:12px;"></div>
+      <div class="divider"></div>
+      <button class="btn btn-historial" onclick="verHistorial()">
+        Ver historial de ganadores anteriores
+      </button>
     </div>
   </div>
 
@@ -121,17 +122,17 @@ select option { background: #1a0a3e; }
   <div id="screen-rifa" class="screen">
 
     <div class="stats">
-      <div class="stat stat-pool">
+      <div class="stat s-pool">
         <div class="stat-num" id="pool-count">0</div>
         <div class="stat-label">En el pool</div>
       </div>
-      <div class="stat stat-rifas">
+      <div class="stat s-rifas">
         <div class="stat-num" id="rifas-count">0</div>
-        <div class="stat-label">Rifas</div>
+        <div class="stat-label">Sorteados</div>
       </div>
-      <div class="stat stat-ganados">
-        <div class="stat-num" id="ganados-count">0</div>
-        <div class="stat-label">Ganadores</div>
+      <div class="stat s-conf">
+        <div class="stat-num" id="conf-count">0</div>
+        <div class="stat-label">Confirmados</div>
       </div>
     </div>
 
@@ -139,17 +140,19 @@ select option { background: #1a0a3e; }
       <h3>Premio de esta rifa</h3>
       <div class="input-group">
         <label>Nombre del premio</label>
-        <input type="text" id="premio-input" placeholder="Ej: Membresía de yoga 1 mes">
+        <input type="text" id="premio-input" placeholder="Ej: Membresía yoga 1 mes">
       </div>
+
       <div class="rolling" id="rolling">
-        <div class="rolling-label">Sorteando...</div>
+        <div class="rolling-label">Sorteando ganador...</div>
         <div class="rolling-name" id="rolling-name">---</div>
       </div>
+
       <div class="winner-box" id="winner-box">
         <div class="confetti">🎊</div>
         <div class="winner-name" id="winner-name"></div>
-        <div class="winner-tipo" id="winner-tipo"></div>
-        <div class="winner-metodo" id="winner-metodo"></div>
+        <div class="winner-sub" id="winner-tipo"></div>
+        <div class="winner-sub" id="winner-metodo"></div>
         <div class="winner-premio" id="winner-premio"></div>
         <div class="winner-sponsor" id="winner-sponsor"></div>
         <div id="correo-status" style="margin-bottom:8px;"></div>
@@ -163,42 +166,63 @@ select option { background: #1a0a3e; }
           Nueva rifa (otro premio)
         </button>
       </div>
+
       <button class="btn btn-rifar" id="btn-rifar" onclick="iniciarRifa()">
         SORTEAR GANADOR
       </button>
       <p class="pool-info" id="pool-info"></p>
     </div>
 
-    <div class="panel" id="panel-ganadores" style="display:none;">
+    <!-- Lista sesion actual -->
+    <div class="panel" id="panel-sesion" style="display:none;">
       <h3>Ganadores de esta sesion</h3>
-      <ul class="ganadores-list" id="ganadores-list"></ul>
+      <ul class="ganadores-list" id="sesion-list"></ul>
     </div>
 
     <button class="btn btn-nuevo" onclick="volverConfig()" style="margin-bottom:20px;">
       Cambiar filtros
     </button>
+  </div>
 
+  <!-- PANTALLA 3: Historial -->
+  <div id="screen-historial" class="screen">
+    <div class="panel">
+      <h3>Historial de ganadores</h3>
+      <div id="historial-content">
+        <div class="loading">Cargando historial...</div>
+      </div>
+    </div>
+    <button class="btn btn-nuevo" onclick="volverConfig()" style="margin-bottom:20px;">
+      Volver
+    </button>
   </div>
 
 </div>
 
 <script>
-var BASE_URL = "https://script.google.com/macros/s/AKfycbzZmPcYBe6MEI-nFZ7T-Qheg6QU1RKFQOU0yHG4elB82MEuUYOFIOB3dEVnuPNd5hileA/exec";
+var BASE_URL = "https://script.google.com/macros/s/AKfycbwZqrugWYHgwsRCDEVnmnf1aC1iednYNYUsfpxQjhGKuLytQ5EybRLpH8xn-r9ddK7boA/exec";
 var todosParticipantes = [];
 var poolActual = [];
 var ganadores = [];
 var ganadorActual = null;
 var rifando = false;
 
+function llamarAPI(params, callbackName, onError) {
+  var script = document.createElement("script");
+  script.src = BASE_URL + params + "&callback=" + callbackName;
+  script.onerror = onError || function() {};
+  document.head.appendChild(script);
+}
+
+// ================================================
+// CARGAR PARTICIPANTES
+// ================================================
 function cargarParticipantes() {
   var status = document.getElementById("config-status");
   status.innerHTML = "<div class='loading'>Cargando desde Google Sheets...</div>";
-  var script = document.createElement("script");
-  script.src = BASE_URL + "?action=ingresados&callback=recibirParticipantes";
-  script.onerror = function() {
+  llamarAPI("?action=ingresados", "recibirParticipantes", function() {
     status.innerHTML = "<p class='error-msg'>Error de conexion. Verifica internet.</p>";
-  };
-  document.head.appendChild(script);
+  });
   setTimeout(function() {
     if (todosParticipantes.length === 0 && status.innerHTML.indexOf("Cargando") >= 0) {
       status.innerHTML = "<p class='error-msg'>Tiempo agotado. Intenta de nuevo.</p>";
@@ -222,37 +246,37 @@ function aplicarFiltros() {
 
   poolActual = todosParticipantes.filter(function(p) {
     var pasaMetodo = !filtroMetodo || p.metodo.indexOf(filtroMetodo) >= 0;
-    var pasaTipo   = !filtroTipo   || p.tipo.indexOf(filtroTipo)   >= 0;
+    var pasaTipo   = !filtroTipo   || p.tipo.indexOf(filtroTipo)     >= 0;
     return pasaMetodo && pasaTipo;
   });
 
   if (poolActual.length === 0) {
     document.getElementById("config-status").innerHTML =
-      "<p class='error-msg'>No hay participantes con esos filtros. Cambia los filtros e intenta.</p>";
+      "<p class='error-msg'>No hay participantes con esos filtros.</p>";
     return;
   }
 
   actualizarStats();
   document.getElementById("screen-config").className = "screen";
   document.getElementById("screen-rifa").className = "screen active";
-  actualizarPoolInfo();
-}
 
-function actualizarPoolInfo() {
-  var filtroMetodo = document.getElementById("filtro-metodo").value || "Todos";
-  var filtroTipo   = document.getElementById("filtro-tipo").value   || "Todos";
-  var sponsor      = document.getElementById("sponsor-input").value;
-  var info = "Pool: " + poolActual.length + " personas | Pago: " + filtroMetodo + " | Entrada: " + filtroTipo;
+  var filtroMetodoText = document.getElementById("filtro-metodo").value || "Todos";
+  var filtroTipoText   = document.getElementById("filtro-tipo").value   || "Todos";
+  var sponsor          = document.getElementById("sponsor-input").value;
+  var info = poolActual.length + " personas | Pago: " + filtroMetodoText + " | Entrada: " + filtroTipoText;
   if (sponsor) info += " | Sponsor: " + sponsor;
   document.getElementById("pool-info").textContent = info;
 }
 
 function actualizarStats() {
-  document.getElementById("pool-count").textContent    = poolActual.length;
-  document.getElementById("rifas-count").textContent   = ganadores.length;
-  document.getElementById("ganados-count").textContent = ganadores.filter(function(g){ return g.confirmado; }).length;
+  document.getElementById("pool-count").textContent  = poolActual.length;
+  document.getElementById("rifas-count").textContent = ganadores.length;
+  document.getElementById("conf-count").textContent  = ganadores.filter(function(g){ return g.confirmado; }).length;
 }
 
+// ================================================
+// RIFA
+// ================================================
 function iniciarRifa() {
   if (rifando || poolActual.length === 0) return;
   var premio = document.getElementById("premio-input").value.trim();
@@ -295,32 +319,28 @@ function iniciarRifa() {
 function mostrarGanador() {
   document.getElementById("rolling").className = "rolling";
   var g = ganadorActual.participante;
-  document.getElementById("winner-name").textContent = g.nombre;
-  document.getElementById("winner-tipo").textContent = g.tipo;
-  document.getElementById("winner-metodo").textContent = "Pago: " + g.metodo;
-  document.getElementById("winner-premio").textContent = ganadorActual.premio;
+  document.getElementById("winner-name").textContent    = g.nombre;
+  document.getElementById("winner-tipo").textContent    = g.tipo;
+  document.getElementById("winner-metodo").textContent  = "Pago: " + g.metodo;
+  document.getElementById("winner-premio").textContent  = ganadorActual.premio;
   document.getElementById("winner-sponsor").textContent = ganadorActual.sponsor ? "Patrocinado por: " + ganadorActual.sponsor : "";
-  document.getElementById("btn-correo").disabled = false;
-  document.getElementById("btn-correo").textContent = "Enviar correo al ganador";
-  document.getElementById("btn-correo").style.background = "#1B7B6E";
+  var btn = document.getElementById("btn-correo");
+  btn.disabled = false;
+  btn.textContent = "Enviar correo al ganador";
+  btn.style.background = "#1B7B6E";
   document.getElementById("winner-box").className = "winner-box visible";
 }
 
+// ================================================
+// ENVIAR CORREO
+// ================================================
 function enviarCorreo() {
   if (!ganadorActual) return;
   var btn = document.getElementById("btn-correo");
   btn.disabled = true;
   btn.textContent = "Enviando...";
 
-  var script = document.createElement("script");
-  var cbName = "cb_correo_" + Date.now();
-  script.src = BASE_URL
-    + "?action=notificar"
-    + "&sid="     + encodeURIComponent(ganadorActual.participante.sid)
-    + "&premio="  + encodeURIComponent(ganadorActual.premio)
-    + "&sponsor=" + encodeURIComponent(ganadorActual.sponsor || "")
-    + "&callback=" + cbName;
-
+  var cbName = "cbCorreo" + Date.now();
   window[cbName] = function(data) {
     if (data && data.success) {
       ganadorActual.correoEnviado = true;
@@ -328,31 +348,58 @@ function enviarCorreo() {
       btn.style.background = "#1B7B6E";
       document.getElementById("correo-status").innerHTML =
         "<div class='exito-msg'>Correo enviado a " + ganadorActual.participante.email + "</div>";
-      confirmarGanador();
+      guardarEnSheets("Si");
     } else {
       btn.disabled = false;
       btn.textContent = "Error — Intentar de nuevo";
     }
   };
 
-  document.head.appendChild(script);
+  llamarAPI(
+    "?action=notificar" +
+    "&sid="     + encodeURIComponent(ganadorActual.participante.sid) +
+    "&premio="  + encodeURIComponent(ganadorActual.premio) +
+    "&sponsor=" + encodeURIComponent(ganadorActual.sponsor || ""),
+    cbName
+  );
 
   setTimeout(function() {
-    if (!ganadorActual || !ganadorActual.correoEnviado) {
+    if (ganadorActual && !ganadorActual.correoEnviado) {
       btn.disabled = false;
-      btn.textContent = "Error de conexion — Intentar";
+      btn.textContent = "Error de conexion — Reintentar";
     }
   }, 12000);
 }
 
-function confirmarGanador() {
+// ================================================
+// GUARDAR EN SHEETS
+// ================================================
+function guardarEnSheets(correoEnviado) {
+  var cbName = "cbGuardar" + Date.now();
+  window[cbName] = function(data) {
+    if (data && data.success) {
+      confirmarGanador(correoEnviado === "Si");
+    }
+  };
+  llamarAPI(
+    "?action=guardar" +
+    "&sid="     + encodeURIComponent(ganadorActual.participante.sid) +
+    "&nombre="  + encodeURIComponent(ganadorActual.participante.nombre) +
+    "&premio="  + encodeURIComponent(ganadorActual.premio) +
+    "&sponsor=" + encodeURIComponent(ganadorActual.sponsor || "") +
+    "&correo="  + encodeURIComponent(correoEnviado),
+    cbName
+  );
+}
+
+function confirmarGanador(correoOk) {
   poolActual = poolActual.filter(function(p) {
     return p.sid !== ganadorActual.participante.sid;
   });
   ganadorActual.confirmado = true;
   ganadores.push(ganadorActual);
   actualizarStats();
-  actualizarListaGanadores();
+  actualizarListaSesion();
 }
 
 function otroGanador() {
@@ -364,7 +411,7 @@ function otroGanador() {
 
 function nuevaRifa() {
   if (ganadorActual && !ganadorActual.confirmado) {
-    confirmarGanador();
+    guardarEnSheets("No");
   }
   rifando = false;
   ganadorActual = null;
@@ -377,15 +424,16 @@ function nuevaRifa() {
 
 function volverConfig() {
   document.getElementById("screen-rifa").className = "screen";
+  document.getElementById("screen-historial").className = "screen";
   document.getElementById("screen-config").className = "screen active";
   document.getElementById("config-status").innerHTML = "";
   rifando = false;
   ganadorActual = null;
 }
 
-function actualizarListaGanadores() {
-  var panel = document.getElementById("panel-ganadores");
-  var lista  = document.getElementById("ganadores-list");
+function actualizarListaSesion() {
+  var panel = document.getElementById("panel-sesion");
+  var lista  = document.getElementById("sesion-list");
   if (ganadores.length === 0) { panel.style.display = "none"; return; }
   panel.style.display = "block";
   lista.innerHTML = ganadores.map(function(g, i) {
@@ -393,10 +441,47 @@ function actualizarListaGanadores() {
       ? "<span class='g-badge badge-ok'>Correo enviado</span>"
       : "<span class='g-badge badge-pend'>Sin correo</span>";
     return "<li>"
-      + "<div class='g-nombre'>" + (i+1) + ". " + g.participante.nombre + "</div>"
-      + "<div class='g-premio'>" + g.premio + (g.sponsor ? " — " + g.sponsor : "") + "</div>"
+      + "<div class='g-num'>Rifa #" + (i+1) + (g.sponsor ? " — " + g.sponsor : "") + "</div>"
+      + "<div class='g-nombre'>" + g.participante.nombre + "</div>"
+      + "<div class='g-premio'>" + g.premio + "</div>"
       + badge + "</li>";
   }).join("");
+}
+
+// ================================================
+// HISTORIAL
+// ================================================
+function verHistorial() {
+  document.getElementById("screen-config").className = "screen";
+  document.getElementById("screen-historial").className = "screen active";
+  document.getElementById("historial-content").innerHTML = "<div class='loading'>Cargando historial...</div>";
+
+  var cbName = "cbHistorial" + Date.now();
+  window[cbName] = function(data) {
+    var content = document.getElementById("historial-content");
+    if (!data || !data.ganadores || data.ganadores.length === 0) {
+      content.innerHTML = "<p style='color:#C9A8F0;font-size:13px;text-align:center;'>No hay ganadores registrados aun.</p>";
+      return;
+    }
+    var html = "<ul class='ganadores-list'>";
+    data.ganadores.forEach(function(g, i) {
+      var badge = g.correo === "Si"
+        ? "<span class='g-badge badge-ok'>Correo enviado</span>"
+        : "<span class='g-badge badge-pend'>Sin correo</span>";
+      html += "<li>"
+        + "<div class='g-num'>" + g.fecha + (g.sponsor ? " — " + g.sponsor : "") + "</div>"
+        + "<div class='g-nombre'>" + g.nombre + "</div>"
+        + "<div class='g-premio'>" + g.premio + "</div>"
+        + badge + "</li>";
+    });
+    html += "</ul>";
+    content.innerHTML = html;
+  };
+
+  llamarAPI("?action=historial", cbName, function() {
+    document.getElementById("historial-content").innerHTML =
+      "<p class='error-msg'>Error al cargar historial.</p>";
+  });
 }
 </script>
 </body>
